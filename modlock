@@ -163,8 +163,15 @@ def cmd_setup():
     cmd_lock()
 
 
+class _Parser(argparse.ArgumentParser):
+    def error(self, message):
+        print(f"modlock: {message}", file=sys.stderr)
+        print("Try 'modlock --help' for more information.", file=sys.stderr)
+        sys.exit(2)
+
+
 def main():
-    p = argparse.ArgumentParser(
+    p = _Parser(
         prog="modlock",
         description="Manage automatic kernel module loading.",
     )
