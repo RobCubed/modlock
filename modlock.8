@@ -1,0 +1,99 @@
+.TH MODLOCK 8 "May 2026" "modlock" "System Administration"
+.SH NAME
+modlock \- manage automatic kernel module loading
+.SH SYNOPSIS
+.B modlock
+.IR OPTION
+.SH DESCRIPTION
+.B modlock
+prevents the kernel from loading modules in response to userspace requests,
+by writing
+.B /bin/true
+to
+.IR /proc/sys/kernel/modprobe .
+A systemd unit re-applies the lock at every boot.
+The lock is reversible at runtime via
+.BR \-\-unlock .
+.SH OPTIONS
+.TP
+.B \-\-setup
+Run
+.BR \-\-update ,
+.BR \-\-install ,
+and
+.B \-\-lock
+in sequence.
+.TP
+.B \-\-update
+Write the currently-loaded module list to
+.IR /etc/modules .
+.TP
+.B \-\-lock
+Write
+.B /bin/true
+to
+.IR /proc/sys/kernel/modprobe .
+.TP
+.B \-\-unlock
+Restore
+.I /proc/sys/kernel/modprobe
+to the path of the real
+.BR modprobe (8).
+.TP
+.B \-\-install
+Install the script to
+.I /usr/local/sbin/modlock
+and enable
+.IR modlock.service .
+Only needs to be run once.
+.TP
+.B \-\-uninstall
+Disable and remove
+.IR modlock.service ,
+then run
+.BR \-\-unlock .
+Does not remove
+.IR /usr/local/sbin/modlock .
+.SH FILES
+.TP
+.I /proc/sys/kernel/modprobe
+Kernel modprobe helper path; written by
+.B \-\-lock
+and
+.BR \-\-unlock .
+.TP
+.I /etc/modules
+Module snapshot written by
+.BR \-\-update ;
+processed by
+.B systemd\-modules\-load.service
+at boot.
+.TP
+.I /etc/systemd/system/modlock.service
+Installed by
+.BR \-\-install .
+.TP
+.I /usr/local/sbin/modlock
+Default installation path.
+.SH EXIT STATUS
+.B 0
+on success,
+.B 1
+on error,
+.B 2
+on bad arguments.
+.SH NOTES
+.B modlock
+does not block direct
+.BR insmod (8)
+calls.
+For a stronger, irreversible lock use
+.B kernel.modules_disabled=1
+via
+.BR sysctl (8).
+.SH SEE ALSO
+.BR modprobe (8),
+.BR lsmod (8),
+.BR insmod (8),
+.BR sysctl (8),
+.BR systemd\-modules\-load.service (8)
