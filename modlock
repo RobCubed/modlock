@@ -73,11 +73,16 @@ def find_modprobe():
     die("cannot locate modprobe binary")
 
 
+def run(cmd, **kwargs):
+    try:
+        return subprocess.run(cmd, check=True, **kwargs)
+    except subprocess.CalledProcessError as e:
+        die(f"{cmd[0]} failed with exit code {e.returncode}")
+
+
 def cmd_update():
     require_root()
-    result = subprocess.run(
-        ["lsmod"], capture_output=True, text=True, check=True
-    )
+    result = run(["lsmod"], capture_output=True, text=True)
     lines = result.stdout.splitlines()
     if lines and lines[0].startswith("Module"):
         lines = lines[1:]
@@ -141,8 +146,8 @@ def cmd_install():
     os.chmod(SERVICE_PATH, 0o644)
     print(f"wrote unit file {SERVICE_PATH}")
 
-    subprocess.run(["systemctl", "daemon-reload"], check=True)
-    subprocess.run(["systemctl", "enable", SERVICE_NAME], check=True)
+    run(["systemctl", "daemon-reload"])
+    run(["systemctl", "enable", SERVICE_NAME])
     print(f"enabled {SERVICE_NAME}")
 
 
@@ -152,7 +157,7 @@ def cmd_uninstall():
         subprocess.run(["systemctl", "disable", SERVICE_NAME], check=False)
         subprocess.run(["systemctl", "stop", SERVICE_NAME], check=False)
         os.unlink(SERVICE_PATH)
-        subprocess.run(["systemctl", "daemon-reload"], check=True)
+        run(["systemctl", "daemon-reload"])
         print(f"removed {SERVICE_PATH}")
     else:
         print(f"no unit file at {SERVICE_PATH}")
