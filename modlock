@@ -154,8 +154,8 @@ def cmd_install():
 def cmd_uninstall():
     require_root()
     if os.path.isfile(SERVICE_PATH):
-        subprocess.run(["systemctl", "disable", SERVICE_NAME], check=False)
-        subprocess.run(["systemctl", "stop", SERVICE_NAME], check=False)
+        subprocess.run(["systemctl", "disable", SERVICE_NAME])
+        subprocess.run(["systemctl", "stop", SERVICE_NAME])
         os.unlink(SERVICE_PATH)
         run(["systemctl", "daemon-reload"])
         print(f"removed {SERVICE_PATH}")
