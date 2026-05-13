@@ -58,11 +58,6 @@ def die(msg, code=1):
     sys.exit(code)
 
 
-def require_root():
-    if os.geteuid() != 0:
-        die("must be run as root")
-
-
 def find_modprobe():
     for p in MODPROBE_SEARCH:
         if os.path.isfile(p):
@@ -81,7 +76,6 @@ def run(cmd, **kwargs):
 
 
 def cmd_update():
-    require_root()
     result = run(["lsmod"], capture_output=True, text=True)
     lines = result.stdout.splitlines()
     if lines and lines[0].startswith("Module"):
@@ -112,14 +106,12 @@ def cmd_update():
 
 
 def cmd_lock():
-    require_root()
     with open(MODPROBE_CTL, "w") as f:
         f.write(DISABLE_VALUE)
     print(f"locked: {MODPROBE_CTL} := {DISABLE_VALUE}")
 
 
 def cmd_unlock():
-    require_root()
     modprobe = find_modprobe()
     with open(MODPROBE_CTL, "w") as f:
         f.write(modprobe)
@@ -127,7 +119,6 @@ def cmd_unlock():
 
 
 def cmd_install():
-    require_root()
     src = os.path.realpath(sys.argv[0])
     if not os.path.isfile(src):
         die(f"cannot locate running script at {src}")
@@ -152,7 +143,6 @@ def cmd_install():
 
 
 def cmd_uninstall():
-    require_root()
     if os.path.isfile(SERVICE_PATH):
         subprocess.run(["systemctl", "disable", SERVICE_NAME])
         subprocess.run(["systemctl", "stop", SERVICE_NAME])
@@ -192,6 +182,9 @@ def main():
     g.add_argument("--setup",     action="store_true",
                    help="run --update, --install, and --lock in sequence")
     args = p.parse_args()
+
+    if os.geteuid() != 0:
+        die("must be run as root")
 
     if   args.update:    cmd_update()
     elif args.lock:      cmd_lock()
