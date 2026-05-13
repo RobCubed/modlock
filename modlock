@@ -144,9 +144,6 @@ def cmd_install():
     subprocess.run(["systemctl", "daemon-reload"], check=True)
     subprocess.run(["systemctl", "enable", SERVICE_NAME], check=True)
     print(f"enabled {SERVICE_NAME}")
-    print()
-    print("the service will gate autoloading off at next boot.")
-    print("you probably want to run `modlock --lock` now to gate it off immediately.")
 
 
 def cmd_uninstall():
@@ -161,9 +158,8 @@ def cmd_uninstall():
         print(f"no unit file at {SERVICE_PATH}")
     if os.path.exists(INSTALL_PATH):
         print(f"note: {INSTALL_PATH} not removed; rm it manually if desired")
-    print()
-    print("autoloading is still gated off in the running kernel.")
-    print("you probably want to run `modlock --unlock` now to restore it.")
+    cmd_unlock()
+    print("modlock fully disabled")
 
 
 def cmd_setup():
