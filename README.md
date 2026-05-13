@@ -12,6 +12,8 @@ Automatic module loading is a huge, mostly-ignored attack surface. Userspace can
 2. Write `/bin/true` to `/proc/sys/kernel/modprobe` so the kernel can no longer satisfy userspace module requests.
 3. Install a systemd unit that re-applies step 2 on every boot, immediately after `systemd-modules-load.service` processes `/etc/modules`.
 
+**Note:** The kernel has a stronger option (`kernel.modules_disabled=1`) but it's a one-way switch; once set you can't undo it without a reboot. modlock uses the weaker `/proc/sys/kernel/modprobe` trick so you can `--unlock`, add hardware, and `--lock` again without rebooting.
+
 ## Commands
 
 | | |
@@ -20,13 +22,20 @@ Automatic module loading is a huge, mostly-ignored attack surface. Userspace can
 | `modlock --lock`      | Set `/proc/sys/kernel/modprobe` = `/bin/true` |
 | `modlock --unlock`    | Set `/proc/sys/kernel/modprobe` back to the real modprobe |
 | `modlock --install`   | Copy script to `/usr/local/sbin/modlock`, install + enable `modlock.service` |
-| `modlock --uninstall` | Remove the service (leaves the binary in place) |
+| `modlock --uninstall` | Disable + remove the service, restore autoloading (leaves the binary in place) |
+| `modlock --setup`     | Run `--update`, `--install`, and `--lock` in sequence |
 
 All commands require root.
 
 ## Setup
 
 Boot normally. Make sure every device you care about is up and every service you need has started. Modules not loaded at this moment will not be loaded after install.
+
+```
+./modlock --setup
+```
+
+Or step by step:
 
 ```
 ./modlock --update
