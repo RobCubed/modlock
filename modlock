@@ -166,6 +166,12 @@ def cmd_uninstall():
     print("you probably want to run `modlock --unlock` now to restore it.")
 
 
+def cmd_setup():
+    cmd_update()
+    cmd_install()
+    cmd_lock()
+
+
 def main():
     p = argparse.ArgumentParser(
         prog="modlock",
@@ -182,6 +188,8 @@ def main():
                    help=f"copy this script to {INSTALL_PATH} and install+enable {SERVICE_NAME}")
     g.add_argument("--uninstall", action="store_true",
                    help=f"remove {SERVICE_NAME} (does not delete {INSTALL_PATH})")
+    g.add_argument("--setup",      action="store_true",
+                   help="run --update, --install, and --lock in sequence")
     args = p.parse_args()
 
     if   args.update:    cmd_update()
@@ -189,6 +197,7 @@ def main():
     elif args.unlock:    cmd_unlock()
     elif args.install:   cmd_install()
     elif args.uninstall: cmd_uninstall()
+    elif args.setup:     cmd_setup()
 
 
 if __name__ == "__main__":
