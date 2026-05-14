@@ -1,0 +1,15 @@
+Source: modlock
+Section: unknown
+Priority: optional
+Maintainer: modlock <modlock@fakeemail.com>
+Rules-Requires-Root: no
+Build-Depends:
+ debhelper-compat (= 13),
+Standards-Version: 4.7.2
+Homepage: https://github.com/madcamel/modlock
+
+Package: modlock
+Architecture: any
+Depends: python3:any
+Suggests: x11-utils
+Description: Lock down module loading to the current state

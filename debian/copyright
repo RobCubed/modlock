@@ -1,0 +1,9 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Source: <https://github.com/madcamel/modlock>
+Upstream-Name: modlock
+
+Files:
+ *
+Copyright:
+ Modlock
+License: Public Domain
